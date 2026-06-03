@@ -11,8 +11,8 @@ import java.util.UUID;
 interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
     @Query("SELECT t FROM Transaction t WHERE " +
-            "(:from IS NULL OR t.dateTime >= :from) AND " +
-            "(:to IS NULL OR t.dateTime <= :to) AND " +
-            "(:category IS NULL OR t.category = :category)")
+            "(CAST(:from AS timestamp) IS NULL OR t.dateTime >= :from) AND " +
+            "(CAST(:to AS timestamp) IS NULL OR t.dateTime <= :to) AND " +
+            "(CAST(:category AS string) IS NULL OR t.category = :category)")
     List<Transaction> findWithFilters(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("category") String category);
 }
