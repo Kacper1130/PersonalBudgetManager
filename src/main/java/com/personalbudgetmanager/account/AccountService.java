@@ -7,6 +7,7 @@ import com.personalbudgetmanager.exception.AccountNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +22,8 @@ public class AccountService {
     }
 
     AccountResponse createAccount(CreateAccountRequest createAccountRequest) {
-        Account account = accountRepository.save(new Account(createAccountRequest.name(), createAccountRequest.balance()));
+        BigDecimal balance = createAccountRequest.balance() != null ? createAccountRequest.balance() : BigDecimal.ZERO;
+        Account account = accountRepository.save(new Account(createAccountRequest.name(), balance));
         return new AccountResponse(account.getId(), account.getName());
     }
 

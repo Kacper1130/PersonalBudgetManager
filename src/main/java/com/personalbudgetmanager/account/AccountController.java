@@ -2,6 +2,7 @@ package com.personalbudgetmanager.account;
 
 import com.personalbudgetmanager.account.dto.AccountResponse;
 import com.personalbudgetmanager.account.dto.CreateAccountRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,13 @@ class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<AccountResponse>> getAllAccounts() {
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
     @PostMapping
-    public ResponseEntity<AccountResponse> createAccount(@RequestBody CreateAccountRequest createAccountRequest) {
+    public ResponseEntity<AccountResponse> createAccount(@Valid @RequestBody CreateAccountRequest createAccountRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(createAccountRequest));
     }
 
