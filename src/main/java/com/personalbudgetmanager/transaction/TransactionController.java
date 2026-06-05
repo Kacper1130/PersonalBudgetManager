@@ -1,6 +1,7 @@
 package com.personalbudgetmanager.transaction;
 
 import com.personalbudgetmanager.transaction.dto.CreateTransactionRequest;
+import com.personalbudgetmanager.transaction.dto.TransactionCreatedResponse;
 import com.personalbudgetmanager.transaction.dto.TransactionResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionResponse> createTransaction(@Valid @RequestBody CreateTransactionRequest createTransactionRequest) {
+    public ResponseEntity<TransactionCreatedResponse> createTransaction(@Valid @RequestBody CreateTransactionRequest createTransactionRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.createTransaction(createTransactionRequest));
     }
 

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler({AccountNotFoundException.class, TransactionNotFoundException.class})
+    @ExceptionHandler({AccountNotFoundException.class, TransactionNotFoundException.class, BudgetLimitNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFoundExceptions(RuntimeException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }

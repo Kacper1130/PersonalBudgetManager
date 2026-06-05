@@ -2,10 +2,12 @@ package com.personalbudgetmanager.transaction;
 
 import com.personalbudgetmanager.account.Account;
 import com.personalbudgetmanager.account.AccountService;
+import com.personalbudgetmanager.budgetLimit.BudgetLimitService;
 import com.personalbudgetmanager.exception.CsvGenerationException;
-import com.personalbudgetmanager.transaction.dto.CreateTransactionRequest;
-import com.personalbudgetmanager.transaction.dto.TransactionResponse;
 import com.personalbudgetmanager.exception.TransactionNotFoundException;
+import com.personalbudgetmanager.transaction.dto.CreateTransactionRequest;
+import com.personalbudgetmanager.transaction.dto.TransactionCreatedResponse;
+import com.personalbudgetmanager.transaction.dto.TransactionResponse;
 import lombok.AllArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -14,8 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,6 +29,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountService accountService;
+    private final BudgetLimitService budgetLimitService;
 
     List<TransactionResponse> getTransactions(LocalDateTime from, LocalDateTime to, String category) {
         List<Transaction> response = transactionRepository.findWithFilters(from, to, category);
@@ -42,7 +48,7 @@ public class TransactionService {
     }
 
     @Transactional
-    TransactionResponse createTransaction(CreateTransactionRequest createTransactionRequest) {
+    TransactionCreatedResponse createTransaction(CreateTransactionRequest createTransactionRequest) {
         Account account = accountService.getAccount(createTransactionRequest.accountId());
 
         Transaction transaction = new Transaction();
@@ -54,15 +60,21 @@ public class TransactionService {
         transaction.setDateTime(dateTime);
         transaction.setAccount(account);
 
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        Optional<String> warningMessage = Optional.empty();
+
         if (createTransactionRequest.type() == TransactionType.INCOME) {
             account.setBalance(account.getBalance().add(createTransactionRequest.amount()));
         } else if (createTransactionRequest.type() == TransactionType.EXPENSE) {
             account.setBalance(account.getBalance().subtract(createTransactionRequest.amount()));
+            Optional<BigDecimal> budgetLimit = budgetLimitService.getBudgetLimit(savedTransaction.getCategory());
+            if (budgetLimit.isPresent()) {
+                warningMessage = checkLimitAndGetWarning(savedTransaction.getCategory(), budgetLimit.get());
+            }
         }
 
-        Transaction savedTransaction = transactionRepository.save(transaction);
-
-        return new TransactionResponse(
+        TransactionResponse transactionResponse = new TransactionResponse(
                 savedTransaction.getId(),
                 savedTransaction.getAmount(),
                 savedTransaction.getType().name(),
@@ -71,6 +83,8 @@ public class TransactionService {
                 savedTransaction.getDateTime(),
                 savedTransaction.getAccount().getId()
         );
+
+        return new TransactionCreatedResponse(transactionResponse, warningMessage.orElse(null));
     }
 
     @Transactional
@@ -117,5 +131,25 @@ public class TransactionService {
         }
 
         return sw.toString();
+    }
+
+    private Optional<String> checkLimitAndGetWarning(String category, BigDecimal limitAmount) {
+        BigDecimal currentMonthSum = getSumOfExpensesForCurrentMonth(category);
+
+        if (currentMonthSum.compareTo(limitAmount) > 0) {
+            return Optional.of(
+                    String.format(
+                            "Warning: Budget limit for category '%s' has been exceeded! Limit: %s, Current Month Total: %s",
+                            category, limitAmount, currentMonthSum
+                    )
+            );
+        }
+
+        return Optional.empty();
+    }
+
+    private BigDecimal getSumOfExpensesForCurrentMonth(String category) {
+        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        return transactionRepository.sumExpensesByCategoryInCurrentMonth(category, startOfMonth);
     }
 }
