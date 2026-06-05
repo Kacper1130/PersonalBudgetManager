@@ -44,4 +44,10 @@ public class AccountService {
     public Account getAccount(UUID id) {
         return accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
     }
+
+    public void verifyAccountExists(UUID accountId) {
+        if (!accountRepository.existsById(accountId)) {
+            throw new AccountNotFoundException(accountId);
+        }
+    }
 }

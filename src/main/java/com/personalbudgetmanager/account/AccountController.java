@@ -2,8 +2,10 @@ package com.personalbudgetmanager.account;
 
 import com.personalbudgetmanager.account.dto.AccountResponse;
 import com.personalbudgetmanager.account.dto.CreateAccountRequest;
+import com.personalbudgetmanager.transaction.TransactionService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.UUID;
 class AccountController {
 
     private final AccountService accountService;
+    private final TransactionService transactionService;
 
     @GetMapping
     public ResponseEntity<List<AccountResponse>> getAllAccounts() {
@@ -37,5 +40,16 @@ class AccountController {
     public ResponseEntity<Void> deleteAccount(@PathVariable UUID id) {
         accountService.deleteAccount(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{id}/transactions/export", produces = "text/csv")
+    public ResponseEntity<String> exportAccountTransactions(@PathVariable("id") UUID accountId) {
+        String csv = transactionService.exportAccountTransactions(accountId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"transactions_account_" + accountId + ".csv\"");
+        headers.set(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+        return ResponseEntity.ok().headers(headers).body(csv);
     }
 }

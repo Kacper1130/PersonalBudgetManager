@@ -15,4 +15,6 @@ interface TransactionRepository extends JpaRepository<Transaction, UUID> {
             "(CAST(:to AS timestamp) IS NULL OR t.dateTime <= :to) AND " +
             "(CAST(:category AS string) IS NULL OR t.category = :category)")
     List<Transaction> findWithFilters(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("category") String category);
+
+    List<Transaction> findByAccountId(UUID accountId);
 }

@@ -2,13 +2,18 @@ package com.personalbudgetmanager.transaction;
 
 import com.personalbudgetmanager.account.Account;
 import com.personalbudgetmanager.account.AccountService;
+import com.personalbudgetmanager.exception.CsvGenerationException;
 import com.personalbudgetmanager.transaction.dto.CreateTransactionRequest;
 import com.personalbudgetmanager.transaction.dto.TransactionResponse;
 import com.personalbudgetmanager.exception.TransactionNotFoundException;
 import lombok.AllArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -85,5 +90,32 @@ public class TransactionService {
 
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
+    }
+
+    public String exportAccountTransactions(UUID accountId) {
+        accountService.verifyAccountExists(accountId);
+        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+
+        StringWriter sw = new StringWriter();
+        CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
+                .setHeader("ID", "Amount", "Type", "Category", "Description", "Date")
+                .build();
+
+        try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
+            for (var t : transactions) {
+                printer.printRecord(
+                        t.getId(),
+                        t.getAmount(),
+                        t.getType(),
+                        t.getCategory(),
+                        t.getDescription() != null ? t.getDescription() : "",
+                        t.getDateTime()
+                );
+            }
+        } catch (IOException e) {
+            throw new CsvGenerationException();
+        }
+
+        return sw.toString();
     }
 }
