@@ -21,25 +21,25 @@ The application operates on two main resources:
 ## Endpoints
 
 ### Accounts
-- `GET /api/accounts` - List all accounts
-- `POST /api/accounts` - Create a new account
-- `GET /api/accounts/{id}` - Get account details with the current balance
-- `DELETE /api/accounts/{id}` - Delete an account (only if it has no transactions)
-- `GET /api/accounts/{id}/transactions` - Get all transactions for a specific account
+- `GET /accounts` - List all accounts
+- `POST /accounts` - Create a new account
+- `GET /accounts/{id}` - Get account details with the current balance
+- `DELETE /accounts/{id}` - Delete an account (only if it has no transactions)
+- `GET /accounts/{id}/transactions` - Get all transactions for a specific account
 
 ### Transactions
-- `GET /api/transactions` - List transactions. Supports optional query parameters: `?from=YYYY-MM-DD`, `?to=YYYY-MM-DD`, `?category=CATEGORY_NAME`
-- `POST /api/transactions` - Add a transaction (automatically updates the associated account balance)
-- `DELETE /api/transactions/{id}` - Delete a transaction (automatically reverts the associated account balance)
-- `GET /api/accounts/{id}/transactions/export` - Export account transactions to a CSV file.
+- `GET /transactions` - List transactions. Supports optional query parameters: `?from=YYYY-MM-DDTHH:mm`, `?to=YYYY-MM-DDTHH:mm`, `?category=CATEGORY_NAME` (e.g., `?from=2024-06-03T12:10`)
+- `POST /transactions` - Add a transaction (automatically updates the associated account balance)
+- `DELETE /transactions/{id}` - Delete a transaction (automatically reverts the associated account balance)
+- `GET /accounts/{id}/transactions/export` - Export account transactions to a CSV file.
 
 ### Summary
-- `GET /api/summary` - Retrieves total incomes, total expenses, and expenses grouped by category.
+- `GET /summary` - Retrieves total incomes, total expenses, and expenses grouped by category.
 
 ### Budget Limits
-- `GET /api/budget-limits` - Get all budget limits.
-- `POST /api/budget-limits` - Set a budget limit for a category.
-- `DELETE /api/budget-limits/{category}` - Delete a budget limit for a category.
+- `GET /budget-limits` - Get all budget limits.
+- `POST /budget-limits` - Set a budget limit for a category.
+- `DELETE /budget-limits/{category}` - Delete a budget limit for a category.
 
 ## Technologies
 
@@ -78,7 +78,7 @@ docker-compose down
 ## API Documentation (Swagger / OpenAPI)
 
 The backend includes Swagger for API documentation. Once the application is running via Docker, the UI can be accessed at:
-- `http://localhost:8080/api/swagger-ui.html`
+- `http://localhost:8080/swagger-ui.html`
 
 ## Testing
 
