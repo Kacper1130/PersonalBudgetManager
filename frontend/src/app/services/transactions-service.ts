@@ -14,7 +14,7 @@ import {handleHttpError} from '../utils/error-handler';
 })
 export class TransactionsService {
   private readonly http = inject(HttpClient);
-  private readonly base = 'http://localhost:8080';
+  private readonly base = 'http://localhost:8080/api';
 
   getTransactions(filters?: TransactionFilters): Observable<Transaction[]> {
     let params = new HttpParams();

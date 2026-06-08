@@ -9,7 +9,7 @@ import {handleHttpError} from '../utils/error-handler';
 })
 export class SummaryService {
   private readonly http = inject(HttpClient);
-  private readonly base = 'http://localhost:8080';
+  private readonly base = 'http://localhost:8080/api';
 
   getSummary(): Observable<SummaryResponse> {
     return this.http

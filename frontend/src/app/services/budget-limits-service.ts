@@ -9,7 +9,7 @@ import {BudgetLimitDto} from '../models/budget-limits.models';
 })
 export class BudgetLimitsService {
   private readonly http = inject(HttpClient);
-  private readonly base = 'http://localhost:8080';
+  private readonly base = 'http://localhost:8080/api';
 
   getBudgetLimits(): Observable<BudgetLimitDto[]> {
     return this.http

@@ -10,7 +10,7 @@ import {Transaction} from '../models/transactions.models';
 })
 export class AccountsService {
   private readonly http = inject(HttpClient);
-  private readonly base = 'http://localhost:8080';
+  private readonly base = 'http://localhost:8080/api';
 
   getAccounts(): Observable<AccountSummary[]> {
     return this.http
