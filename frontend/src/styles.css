@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+
+  --animate-slide-up:   slide-up 0.2s cubic-bezier(0.16,1,0.3,1);
+  --animate-fade-in:    fade-in 0.15s ease;
+  --animate-spin:       spin 0.6s linear infinite;
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(6px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { @apply bg-zinc-50 text-zinc-900 antialiased; }
+  ::-webkit-scrollbar       { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-zinc-200 rounded; }
+}
+
+@layer components {
+  .field-label {
+    @apply block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5;
+  }
+  .field-input {
+    @apply w-full h-8 px-2.5 border border-zinc-200 rounded-md text-[13px]
+    font-[family-name:--font-sans] text-zinc-900 bg-white outline-none
+    transition-colors placeholder:text-zinc-300
+    focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/[0.04];
+  }
+  .ledger-th {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-zinc-400;
+  }
+  .btn-ghost-sm {
+    @apply inline-flex items-center h-7 px-2.5 rounded-md border border-zinc-200
+    bg-white text-[12px] font-medium text-zinc-500
+    hover:bg-zinc-50 hover:border-zinc-300 transition-all cursor-pointer;
+  }
+  .btn-primary-sm {
+    @apply inline-flex items-center h-7 px-2.5 rounded-md border border-zinc-900
+    bg-zinc-900 text-[12px] font-medium text-white
+    hover:bg-zinc-700 hover:border-zinc-700 transition-all cursor-pointer;
+  }
+  .del-btn {
+    @apply inline-flex items-center justify-center w-6 h-6 rounded-md
+    border border-zinc-200 bg-white text-[11px] text-zinc-400
+    hover:border-red-200 hover:bg-red-50 hover:text-red-500
+    transition-all cursor-pointer disabled:opacity-40;
+  }
+}

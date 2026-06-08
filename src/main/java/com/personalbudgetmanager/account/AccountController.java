@@ -3,6 +3,7 @@ package com.personalbudgetmanager.account;
 import com.personalbudgetmanager.account.dto.AccountResponse;
 import com.personalbudgetmanager.account.dto.CreateAccountRequest;
 import com.personalbudgetmanager.transaction.TransactionService;
+import com.personalbudgetmanager.transaction.dto.TransactionResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +41,11 @@ class AccountController {
     public ResponseEntity<Void> deleteAccount(@PathVariable UUID id) {
         accountService.deleteAccount(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/transactions")
+    public ResponseEntity<List<TransactionResponse>> getAccountTransactions(@PathVariable("id") UUID accountId) {
+        return ResponseEntity.ok(transactionService.getAccountTransactions(accountId));
     }
 
     @GetMapping(value = "/{id}/transactions/export", produces = "text/csv")

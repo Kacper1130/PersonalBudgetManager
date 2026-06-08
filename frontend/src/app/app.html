@@ -1,0 +1,29 @@
+<div class="min-h-screen bg-zinc-50">
+  <nav class="sticky top-0 z-40 bg-white border-b border-zinc-200 h-12
+            flex items-center justify-center px-5">
+    <div class="flex items-center gap-6">
+      <div class="flex">
+        <a routerLink="/dashboard"
+           routerLinkActive="!text-zinc-900 border-b-zinc-900"
+           class="h-12 flex items-center px-3 text-[13px] font-medium text-zinc-400
+                border-b-2 border-transparent transition-colors hover:text-zinc-700">
+          Dashboard
+        </a>
+        <a routerLink="/transactions"
+           routerLinkActive="!text-zinc-900 border-b-zinc-900"
+           class="h-12 flex items-center px-3 text-[13px] font-medium text-zinc-400
+                border-b-2 border-transparent transition-colors hover:text-zinc-700">
+          Transactions
+        </a>
+        <a routerLink="/budget-limits"
+           routerLinkActive="!text-zinc-900 border-b-zinc-900"
+           class="h-12 flex items-center px-3 text-[13px] font-medium text-zinc-400
+                border-b-2 border-transparent transition-colors hover:text-zinc-700">
+          Budget limits
+        </a>
+      </div>
+    </div>
+  </nav>
+  <router-outlet/>
+  <app-notification/>
+</div>

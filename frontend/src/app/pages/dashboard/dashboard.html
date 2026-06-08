@@ -1,0 +1,200 @@
+<div class="max-w-5xl mx-auto px-5 py-6">
+
+  <div class="flex items-end justify-between mb-5">
+    <h1 class="text-[18px] font-semibold tracking-tight text-zinc-900">Dashboard</h1>
+    <button class="btn-primary-sm gap-1.5" (click)="showAddModal.set(true)">
+      <span class="text-[14px]">+</span> New account
+    </button>
+  </div>
+
+  <div class="grid grid-cols-3 divide-x divide-zinc-200 border border-zinc-200
+              rounded-lg overflow-hidden bg-white mb-4">
+    <div class="px-5 py-4">
+      <p class="field-label">Total income</p>
+      @if (summary()) {
+        <p class="text-[28px] font-semibold tracking-[-0.6px] text-emerald-600
+                  tabular-nums leading-none mt-1">
+          {{ summary()!.totalIncome | currency }}
+        </p>
+      } @else {
+        <div class="h-7 w-36 bg-zinc-100 rounded animate-pulse mt-1"></div>
+      }
+    </div>
+    <div class="px-5 py-4">
+      <p class="field-label">Total expenses</p>
+      @if (summary()) {
+        <p class="text-[28px] font-semibold tracking-[-0.6px] text-red-500
+                  tabular-nums leading-none mt-1">
+          {{ summary()!.totalExpense | currency }}
+        </p>
+      } @else {
+        <div class="h-7 w-36 bg-zinc-100 rounded animate-pulse mt-1"></div>
+      }
+    </div>
+    <div class="px-5 py-4">
+      <p class="field-label">Net balance</p>
+      @if (summary()) {
+        <p class="text-[28px] font-semibold tracking-[-0.6px] tabular-nums leading-none mt-1"
+           [class.text-emerald-600]="net() >= 0"
+           [class.text-red-500]="net() < 0">
+          {{ net() | currency }}
+        </p>
+      } @else {
+        <div class="h-7 w-36 bg-zinc-100 rounded animate-pulse mt-1"></div>
+      }
+    </div>
+  </div>
+
+
+  <div class="grid grid-cols-[1fr_1.5fr] gap-3">
+
+    <div class="bg-white border border-zinc-200 rounded-lg overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-zinc-100">
+        <span class="ledger-th">By category</span>
+      </div>
+
+      @if (!summary()) {
+        <div class="p-4 flex flex-col gap-3">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="h-3 bg-zinc-100 rounded animate-pulse"
+                 [style.width]="(90 - i * 12) + '%'"></div>
+          }
+        </div>
+      }
+      @if (summary() && catEntries().length === 0) {
+        <p class="px-4 py-8 text-[12px] text-zinc-300 text-center">
+          No expenses recorded
+        </p>
+      }
+      @if (catEntries().length > 0) {
+        <div class="divide-y divide-zinc-50">
+          @for (entry of catEntries(); track entry[0]) {
+            <div class="flex items-center gap-3 px-4 py-2.5">
+              <span class="text-[12px] font-medium text-zinc-600
+                           w-[105px] shrink-0 truncate">{{ entry[0] }}</span>
+              <div class="flex-1 h-[3px] bg-zinc-100 rounded-full overflow-hidden">
+                <div class="h-full bg-red-400/60 rounded-full transition-[width] duration-700"
+                     [style.width]="barWidth(entry[1])"></div>
+              </div>
+              <span class="text-[11px] text-zinc-400 font-mono tabular-nums
+                           w-[72px] text-right shrink-0">
+                {{ entry[1] | currency }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="bg-white border border-zinc-200 rounded-lg overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-zinc-100">
+        <span class="ledger-th">Accounts</span>
+        <button class="btn-ghost-sm gap-1" (click)="showAddModal.set(true)">
+          <span class="text-[14px]">+</span> Add
+        </button>
+      </div>
+
+      @if (loading()) {
+        <div class="divide-y divide-zinc-50">
+          @for (i of [1, 2, 3]; track i) {
+            <div class="px-4 py-3 animate-pulse flex justify-between items-center">
+              <div class="h-3 w-32 bg-zinc-100 rounded"></div>
+              <div class="h-3 w-16 bg-zinc-100 rounded"></div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!loading() && accounts().length === 0) {
+        <p class="px-4 py-8 text-[12px] text-zinc-300 text-center">
+          No accounts yet. Add one to get started.
+        </p>
+      }
+
+      @if (!loading() && accounts().length > 0) {
+        <div class="divide-y divide-zinc-50">
+          @for (account of accounts(); track account.id) {
+            <div class="px-4 py-3 flex items-center justify-between
+                    hover:bg-zinc-100 transition-colors group cursor-pointer"
+                 (click)="openAccount(account.id)">
+
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-7 h-7 rounded-md bg-zinc-100 border border-zinc-200
+                        flex items-center justify-center text-[11px] font-semibold
+                        text-zinc-500 shrink-0">
+                  {{ account.name.charAt(0).toUpperCase() }}
+                </div>
+                <span class="text-[13px] font-medium text-zinc-800 truncate">
+                {{ account.name }}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="del-btn opacity-0 group-hover:opacity-100 transition-opacity"
+                        (click)="$event.stopPropagation(); deleteAccount(account.id)"
+                        title="Delete account">
+                    ✕
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+
+  </div>
+</div>
+
+@if (showAddModal()) {
+  <div class="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4
+              animate-fade-in"
+       (click)="$event.target === $event.currentTarget && showAddModal.set(false)">
+    <div class="bg-white rounded-xl border border-zinc-200 p-5 w-full max-w-xs
+                shadow-lg shadow-zinc-900/5 animate-[slide-up_0.2s_cubic-bezier(0.16,1,0.3,1)]">
+
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-[14px] font-semibold text-zinc-900 tracking-tight">
+          New account
+        </h3>
+        <button class="del-btn" (click)="showAddModal.set(false)">✕</button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div>
+          <label class="field-label">Account name</label>
+          <input type="text" class="field-input"
+                 placeholder="e.g. Main Checking"
+                 [ngModel]="newAccountName()"
+                 (ngModelChange)="newAccountName.set($event)"
+                 (keyup.enter)="createAccount()"
+                 autofocus/>
+        </div>
+
+        <div>
+          <label class="field-label">
+            Initial balance
+            <span class="normal-case font-normal text-zinc-300 ml-1">optional</span>
+          </label>
+          <input type="number" class="field-input font-mono"
+                 min="0" step="0.01" placeholder="0.00"
+                 [ngModel]="newInitialBal()"
+                 (ngModelChange)="newInitialBal.set($event ?? null)"/>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button class="btn-ghost-sm flex-1 justify-center h-8"
+                (click)="showAddModal.set(false)">
+          Cancel
+        </button>
+        <button class="btn-primary-sm flex-1 justify-center h-8 gap-1.5"
+                (click)="createAccount()">
+          Create
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -1,0 +1,130 @@
+<div class="max-w-5xl mx-auto px-5 py-6">
+
+  <div class="flex items-end justify-between mb-5">
+    <div>
+      <h1 class="text-[18px] font-semibold tracking-tight text-zinc-900">Budget limits</h1>
+      <p class="text-[12px] text-zinc-400 mt-0.5">
+        Set monthly spending caps per category
+      </p>
+    </div>
+  </div>
+
+  <div class="bg-white border border-zinc-200 rounded-lg p-3.5 mb-4">
+    <div class="flex items-end gap-2">
+
+      <div class="flex-1">
+        <label class="field-label">Category</label>
+        <input type="text" class="field-input"
+               placeholder="e.g. food, transport…"
+               [(ngModel)]="form.category"
+               (keyup.enter)="save()" />
+      </div>
+
+      <div style="width:160px">
+        <label class="field-label">Monthly limit</label>
+        <input type="number" class="field-input font-mono"
+               min="0.01" step="0.01" placeholder="0.00"
+               [(ngModel)]="form.limitAmount"
+               (keyup.enter)="save()" />
+      </div>
+
+      <button class="btn-primary-sm h-8 gap-1.5"
+              (click)="save()">
+        Save limit
+      </button>
+
+    </div>
+    <p class="text-[11px] text-zinc-400 mt-2">
+      Category names are normalized to lowercase. Saving an existing category updates it.
+    </p>
+  </div>
+
+  @if (loading()) {
+    <div class="bg-white border border-zinc-200 rounded-lg overflow-hidden">
+      @for (i of [1,2,3]; track i) {
+        <div class="flex items-center gap-4 px-4 py-3.5 border-b border-zinc-50
+                    last:border-0 animate-pulse">
+          <div class="h-3 w-24 bg-zinc-100 rounded"></div>
+          <div class="flex-1 h-[3px] bg-zinc-100 rounded"></div>
+          <div class="h-3 w-28 bg-zinc-100 rounded"></div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!loading() && limits().length === 0) {
+    <div class="bg-white border border-zinc-200 rounded-lg py-14 text-center">
+      <p class="text-[12px] text-zinc-300">No budget limits configured</p>
+    </div>
+  }
+
+  @if (!loading() && limitsWithProgress().length > 0) {
+    <div class="bg-white border border-zinc-200 rounded-lg overflow-hidden">
+
+      <div class="grid grid-cols-[1fr_2fr_100px_100px_60px] px-4 py-2
+                  border-b border-zinc-200 gap-4 bg-zinc-50/80">
+        <span class="ledger-th">Category</span>
+        <span class="ledger-th">Usage</span>
+        <span class="ledger-th pl-2">Spent</span>
+        <span class="ledger-th">Limit</span>
+        <span></span>
+      </div>
+
+      <div class="divide-y divide-zinc-50">
+        @for (item of limitsWithProgress(); track item.category) {
+          <div class="grid grid-cols-[1fr_2fr_100px_100px_60px] px-4 py-3
+                      gap-4 items-center hover:bg-zinc-100 transition-colors group">
+
+            <div class="text-[13px] font-medium text-zinc-700 truncate capitalize">
+              {{ item.category }}
+            </div>
+
+            <div class="flex items-center gap-2.5">
+              <div class="flex-1 h-[4px] bg-zinc-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-[width] duration-700"
+                     [style.width]="item.pct + '%'"
+                     [class.bg-emerald-500]="item.status === 'ok'"
+                     [class.bg-amber-400]="item.status === 'warn'"
+                     [class.bg-red-500]="item.status === 'over'">
+                </div>
+              </div>
+              <span class="text-[11px] tabular-nums w-8 text-right shrink-0"
+                    [class.text-zinc-400]="item.status === 'ok'"
+                    [class.text-amber-500]="item.status === 'warn'"
+                    [class.text-red-500]="item.status === 'over'">
+                {{ item.pct | number:'1.0-0' }}%
+              </span>
+            </div>
+
+            <div class="text-[13px] tabular-nums font-mono pl-2"
+                 [class.text-zinc-500]="item.status === 'ok'"
+                 [class.text-amber-500]="item.status === 'warn'"
+                 [class.text-red-500]="item.status === 'over'">
+              {{ item.spent | currency }}
+            </div>
+
+            <div class="text-[13px] text-zinc-400 font-mono tabular-nums">
+              {{ item.limitAmount | currency }}
+            </div>
+
+            <div class="flex items-center gap-1
+                        opacity-0 group-hover:opacity-100 transition-opacity">
+              <button class="btn-ghost-sm h-6 px-2 text-[11px]"
+                      (click)="editLimit(item)"
+                      title="Edit">
+                Edit
+              </button>
+              <button class="del-btn"
+                      (click)="delete(item.category)"
+                      title="Remove limit">
+                 ✕
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>

@@ -106,9 +106,24 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-    public String exportAccountTransactions(UUID accountId) {
+    public List<TransactionResponse> getAccountTransactions(UUID accountId) {
         accountService.verifyAccountExists(accountId);
-        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+        List<Transaction> transactions = transactionRepository.findByAccountIdOrderByDateTimeDesc(accountId);
+
+        return transactions.stream()
+                .map(t -> new TransactionResponse(
+                        t.getId(),
+                        t.getAmount(),
+                        t.getType().name(),
+                        t.getCategory(),
+                        t.getDescription(),
+                        t.getDateTime(),
+                        t.getAccount().getId()
+                )).toList();
+    }
+
+    public String exportAccountTransactions(UUID accountId) {
+        List<TransactionResponse> transactions = getAccountTransactions(accountId);
 
         StringWriter sw = new StringWriter();
         CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
@@ -118,12 +133,12 @@ public class TransactionService {
         try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
             for (var t : transactions) {
                 printer.printRecord(
-                        t.getId(),
-                        t.getAmount(),
-                        t.getType(),
-                        t.getCategory(),
-                        t.getDescription() != null ? t.getDescription() : "",
-                        t.getDateTime()
+                        t.id(),
+                        t.amount(),
+                        t.type(),
+                        t.category(),
+                        t.description() != null ? t.description() : "",
+                        t.dateTime()
                 );
             }
         } catch (IOException e) {

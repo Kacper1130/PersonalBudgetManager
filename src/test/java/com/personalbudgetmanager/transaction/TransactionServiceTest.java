@@ -163,24 +163,26 @@ class TransactionServiceTest {
 
     @Test
     void exportAccountTransactions_ShouldGenerateCsvString() {
-        // Arrange
         UUID accountId = UUID.randomUUID();
+
+        Account account = new Account();
+        account.setId(accountId);
+
         Transaction t1 = new Transaction();
         t1.setId(UUID.randomUUID());
         t1.setAmount(BigDecimal.valueOf(100));
         t1.setType(TransactionType.EXPENSE);
         t1.setCategory("Paliwo");
         t1.setDateTime(LocalDateTime.now());
+        t1.setAccount(account);
 
-        when(transactionRepository.findByAccountId(accountId)).thenReturn(List.of(t1));
+        when(transactionRepository.findByAccountIdOrderByDateTimeDesc(accountId)).thenReturn(List.of(t1));
 
-        // Act
         String csvResult = transactionService.exportAccountTransactions(accountId);
 
-        // Assert
         assertNotNull(csvResult);
-        assertTrue(csvResult.contains("Amount")); // Sprawdzamy czy są nagłówki
-        assertTrue(csvResult.contains("100")); // Sprawdzamy czy są dane z transakcji
+        assertTrue(csvResult.contains("Amount"));
+        assertTrue(csvResult.contains("100"));
         assertTrue(csvResult.contains("Paliwo"));
         verify(accountService).verifyAccountExists(accountId);
     }

@@ -1,0 +1,29 @@
+<div class="fixed top-5 right-5 z-[9999] flex flex-col-reverse gap-2 pointer-events-none" role="region" aria-label="Notifications">
+  @for (notification of notificationService.notifications(); track notification.id) {
+    <div
+      class="pointer-events-auto flex items-start gap-2.5 min-w-[280px] max-w-[360px]
+             rounded-lg border px-3.5 py-2.5 text-[13px] font-medium
+             animate-[slide-up_0.2s_cubic-bezier(0.16,1,0.3,1)]"
+      [class]="toastClasses(notification)"
+      role="alert">
+
+      <div class="mt-[1px] w-4 h-4 rounded-full flex items-center justify-center
+                  text-[9px] font-bold shrink-0"
+           [class]="iconClasses(notification)">
+        {{ notification.type === 'success' ? '✓' : notification.type === 'error' ? '✕' : '!' }}
+      </div>
+
+      <div class="flex-1 leading-snug" [class]="messageClasses(notification)">
+        {{ notification.message }}
+      </div>
+
+      <button class="shrink-0 mt-px text-[12px] transition-opacity opacity-40
+                     hover:opacity-100 cursor-pointer border-none bg-transparent p-0"
+              [class]="dismissClasses(notification)"
+              (click)="notificationService.dismiss(notification.id)"
+              aria-label="Dismiss">
+        ✕
+      </button>
+    </div>
+  }
+</div>

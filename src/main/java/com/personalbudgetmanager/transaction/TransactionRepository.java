@@ -14,10 +14,10 @@ interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     @Query("SELECT t FROM Transaction t WHERE " +
             "(CAST(:from AS timestamp) IS NULL OR t.dateTime >= :from) AND " +
             "(CAST(:to AS timestamp) IS NULL OR t.dateTime <= :to) AND " +
-            "(CAST(:category AS string) IS NULL OR t.category = :category)")
+            "(CAST(:category AS string) IS NULL OR t.category = :category) ORDER BY t.dateTime DESC")
     List<Transaction> findWithFilters(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("category") String category);
 
-    List<Transaction> findByAccountId(UUID accountId);
+    List<Transaction> findByAccountIdOrderByDateTimeDesc(UUID accountId);
 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
             "WHERE t.type = 'EXPENSE' " +
