@@ -18,6 +18,15 @@ The application operates on two main resources:
 - Transaction date
 - Associated account
 
+## Screenshots
+
+![Dashboard View](screenshots/dashboard.png)
+
+![Transaction View](screenshots/transactions.png)
+
+![Budget Limits View](screenshots/budget-limits.png)
+
+
 ## Endpoints
 
 ### Accounts
@@ -52,13 +61,20 @@ The application operates on two main resources:
 
 ### Prerequisites
 
+- Git
 - Docker and Docker Compose
 
 ### Running the Application
 
 The project includes a `docker-compose.yml` file to start the entire stack (Database, Backend API, and Frontend GUI) with a single command.
 
-1. Clone the repository and navigate to the project root directory.
+1. Clone the repository and navigate to the project root directory:
+
+```bash
+git clone https://github.com/Kacper1130/PersonalBudgetManager
+cd PersonalBudgetManager
+```
+
 2. Run the following command to build and start all services:
 
 ```bash
@@ -85,10 +101,16 @@ The backend includes Swagger for API documentation. Once the application is runn
 The project includes tests for core business logic.
 
 ### Backend Tests
-Navigate to the project root and run:
+Navigate to the project root and run the appropriate command for your operating system:
+
 ```bash
+# On Linux or macOS
 ./mvnw test
+
+# On Windows
+mvnw.cmd test
 ```
+
 
 ## AI Usage
 
